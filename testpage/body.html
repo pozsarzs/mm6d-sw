@@ -5,16 +5,16 @@
       function OpenPage() {
         var ipaddress = document.getElementById('ipaddress').value;
         var page = document.querySelector('input[name = "page"]:checked').value;
-        var username = document.getElementById('username').value;
-        window.open ("http://" + ipaddress + page + "?username=" + username, target='bottom');
+        var uid = document.getElementById('uid').value;
+        window.open ("http://" + ipaddress + page + "?uid=" + uid, target='bottom');
       }
     </script>
     <fieldset>
       <legend>&nbsp;Controller&nbsp;</legend>
       <label for="ipaddress">IP address of controller:</label><br>
       <input type="text" id="ipaddress" /><br>
-      <label for="username">Username:</label><br>
-      <input type="text" id="username" /><br>
+      <label for="uid">UID:</label><br>
+      <input type="text" id="uid" /><br>
     </fieldset>
     <br>
     <fieldset>

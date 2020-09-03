@@ -70,7 +70,7 @@ const String msg28          = "Pozsar Zsolt";
 const String msg29          = "  device MAC address: ";
 
 // general constants
-const int interval          = 0;
+const int interval          = 60000;
 const String swversion      = "0.1";
 
 // variables
@@ -526,7 +526,7 @@ void loop(void)
   {
     timeout = 1;
     digitalWrite(prt_led_blue, HIGH);
-    Serial.print(msg14);
+    Serial.println(msg14);
   } else
   {
     timeout = 0;
