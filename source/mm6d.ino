@@ -53,7 +53,7 @@ const String msg11          = "  gateway IP address: ";
 const String msg12          = "* Starting webserver...";
 const String msg13          = "* HTTP request received from: ";
 const String msg14          = "* E01: Control timeout error!";
-const String msg15          = "";
+const String msg15          = "* All outputs are switched off.";
 const String msg16          = "MM6D";
 const String msg17          = "Authentication error!";
 const String msg18          = "* E03: Authentication error!";
@@ -62,12 +62,15 @@ const String msg20          = "* E04: Not allowed client IP address!";
 const String msg21          = "Page not found!";
 const String msg22          = "* E05: Page not found!";
 const String msg23          = "* E02: Overcurrent protection error!";
-const String msg24          = "";
-const String msg25          = "";
-const String msg26          = "";
+const String msg24          = "* Heater is switched";
+const String msg25          = "* Lamp is switched";
+const String msg26          = "* Ventilator is switched";
 const String msg27          = "Done.";
 const String msg28          = "Pozsar Zsolt";
 const String msg29          = "  device MAC address: ";
+const String msg30          = "* Alarm input is restored.";
+const String msg31          = " off.";
+const String msg32          = " on.";
 
 // general constants
 const int interval          = 60000;
@@ -314,7 +317,8 @@ void setup(void)
         heat = 0;
         lamp = 0;
         vent = 0;
-        server.send(200, "text/plain", "* All outputs are switched off.");
+        server.send(200, "text/plain", msg27);
+        Serial.println(msg15);
       } else
       {
         server.send(401, "text/plain", msg17);
@@ -340,7 +344,8 @@ void setup(void)
       {
         prevtime = millis();
         alarm = 0;
-        server.send(200, "text/plain", "* Alarm input is restored.");
+        server.send(200, "text/plain", msg27);
+        Serial.println(msg30);
       } else
       {
         server.send(401, "text/plain", msg17);
@@ -366,7 +371,8 @@ void setup(void)
       {
         prevtime = millis();
         heat = 0;
-        server.send(200, "text/plain", "* Heater is switched off.");
+        server.send(200, "text/plain", msg27);
+        Serial.println(msg24 + msg31);
       } else
       {
         server.send(401, "text/plain", msg17);
@@ -392,7 +398,8 @@ void setup(void)
       {
         prevtime = millis();
         heat = 1;
-        server.send(200, "text/plain", "* Heater is switched on.");
+        server.send(200, "text/plain", msg27);
+        Serial.println(msg24 + msg32);
       } else
       {
         server.send(401, "text/plain", msg17);
@@ -418,7 +425,8 @@ void setup(void)
       {
         prevtime = millis();
         lamp = 0;
-        server.send(200, "text/plain", "* Lamp is switched off.");
+        server.send(200, "text/plain", msg27);
+        Serial.println(msg25 + msg31);
       } else
       {
         server.send(401, "text/plain", msg17);
@@ -444,7 +452,8 @@ void setup(void)
       {
         prevtime = millis();
         lamp = 1;
-        server.send(200, "text/plain", "* Lamp is switched on.");
+        server.send(200, "text/plain", msg27);
+        Serial.println(msg25 + msg32);
       } else
       {
         server.send(401, "text/plain", msg17);
@@ -470,7 +479,8 @@ void setup(void)
       {
         prevtime = millis();
         vent = 0;
-        server.send(200, "text/plain", "* Ventilator is switched off.");
+        server.send(200, "text/plain", msg27);
+        Serial.println(msg26 + msg31);
       } else
       {
         server.send(401, "text/plain", msg17);
@@ -496,7 +506,8 @@ void setup(void)
       {
         prevtime = millis();
         vent = 1;
-        server.send(200, "text/plain", "* Ventilator is switched on.");
+        server.send(200, "text/plain", msg27);
+        Serial.println(msg26 + msg32);
       } else
       {
         server.send(401, "text/plain", msg17);
