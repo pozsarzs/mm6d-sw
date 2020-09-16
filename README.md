@@ -1,6 +1,6 @@
 **MM6D * Remote controlled switching device**  
 Copyright (C) 2020 Pozsár Zsolt <pozsar.zsolt@szerafingomba.hu>  
-Homepage: <http://www.szerafingomba.hu/equipments/>  
+Homepage: <http://www.szerafingomba.hu/softwares/>  
 GitHub: <https://github.com/pozsarzs/mm6d-sw>
 
 **Software**
