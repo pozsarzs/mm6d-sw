@@ -13,16 +13,15 @@
 // FOR A PARTICULAR PURPOSE.
 
 #include <ESP8266WebServer.h>
+#include <StringSplitter.h>
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 
 // settings
-const char* wifi_ssid       = "";
-const char* wifi_password   = "";
-const String uid            = "";
-const String allowedaddress = "";
-const int alarmminlevel     = 0;
-const int alarmmaxlevel     = 512;
+const char* wifi_ssid       = "";  // SSID of Wi-Fi AP
+const char* wifi_password   = "";  // password of Wi-Fi AP
+const String uid            = "";  // user ID
+const String allowedaddress = "";  // client IP addresses with space delimiter
 
 // GPIO ports
 const int prt_buzzer        = 4;
@@ -73,6 +72,8 @@ const String msg31          = " off.";
 const String msg32          = " on.";
 
 // general constants
+const int alarmminlevel     = 0;
+const int alarmmaxlevel     = 512;
 const int interval          = 60000;
 const String swversion      = "0.1";
 
@@ -138,8 +139,7 @@ void setup(void)
   server.onNotFound(handleNotFound);
   server.on("/", []()
   {
-    Serial.println(msg13 + server.client().remoteIP().toString() + ".");
-    blinkblueled();
+    writeclientipaddress();
     line = "<html><head><title>" + msg01 + "</title></head>"
            "<body bgcolor=\"#e2f4fd\"><h2>" + msg01 + "</h2>""<br>"
            "Software version: v" + swversion + "<br>"
@@ -168,148 +168,74 @@ void setup(void)
   });
   server.on("/version", []()
   {
-    Serial.println(msg13 + server.client().remoteIP().toString() + ".");
-    blinkblueled();
+    writeclientipaddress();
     line = msg16 + "\n" + swversion;
     server.send(200, "text/plain", line);
     delay(100);
   });
   server.on("/get/all", []()
   {
-    blinkblueled();
-    clientaddress = server.client().remoteIP().toString();
-    Serial.println(msg13 + clientaddress + ".");
-    if (clientaddress == allowedaddress)
+    if (checkipaddress() == 1)
     {
       if (checkuid() == 1)
       {
         prevtime = millis();
         line = String((int)alarm) + "\n" + String((int)opmode) + "\n" +  String((int)swmanu) + "\n" + String((int)ocprot);
         server.send(200, "text/plain", line);
-      } else
-      {
-        server.send(401, "text/plain", msg17);
-        Serial.println(msg18);
       }
-    } else
-    {
-      server.send(401, "text/plain", msg19);
-      beep();
-      beep();
-      beep();
-      Serial.println(msg20);
     }
   });
   server.on("/get/alarm", []()
   {
-    blinkblueled();
-    clientaddress = server.client().remoteIP().toString();
-    Serial.println(msg13 + clientaddress + ".");
-    if (clientaddress == allowedaddress)
+    if (checkipaddress() == 1)
     {
       if (checkuid() == 1)
       {
         prevtime = millis();
         line = String((int)alarm);
         server.send(200, "text/plain", line);
-      } else
-      {
-        server.send(401, "text/plain", msg17);
-        Serial.println(msg18);
       }
-    } else
-    {
-      server.send(401, "text/plain", msg19);
-      beep();
-      beep();
-      beep();
-      Serial.println(msg20);
     }
   });
   server.on("/get/operationmode", []()
   {
-    blinkblueled();
-    clientaddress = server.client().remoteIP().toString();
-    Serial.println(msg13 + clientaddress + ".");
-    if (clientaddress == allowedaddress)
+    if (checkipaddress() == 1)
     {
       if (checkuid() == 1)
       {
         prevtime = millis();
         line = String((int)opmode);
         server.send(200, "text/plain", line);
-      } else
-      {
-        server.send(401, "text/plain", msg17);
-        Serial.println(msg18);
       }
-    } else
-    {
-      server.send(401, "text/plain", msg19);
-      beep();
-      beep();
-      beep();
-      Serial.println(msg20);
     }
   });
   server.on("/get/manualswitch", []()
   {
-    blinkblueled();
-    clientaddress = server.client().remoteIP().toString();
-    Serial.println(msg13 + clientaddress + ".");
-    if (clientaddress == allowedaddress)
+    if (checkipaddress() == 1)
     {
       if (checkuid() == 1)
       {
         prevtime = millis();
         line = String((int)swmanu);
         server.send(200, "text/plain", line);
-      } else
-      {
-        server.send(401, "text/plain", msg17);
-        Serial.println(msg18);
       }
-    } else
-    {
-      server.send(401, "text/plain", msg19);
-      beep();
-      beep();
-      beep();
-      Serial.println(msg20);
     }
   });
   server.on("/get/protection", []()
   {
-    blinkblueled();
-    clientaddress = server.client().remoteIP().toString();
-    Serial.println(msg13 + clientaddress + ".");
-    if (clientaddress == allowedaddress)
+    if (checkipaddress() == 1)
     {
       if (checkuid() == 1)
       {
         prevtime = millis();
         line = String((int)ocprot);
         server.send(200, "text/plain", line);
-      } else
-      {
-        server.send(401, "text/plain", msg17);
-        Serial.println(msg18);
       }
-    } else
-    {
-      server.send(401, "text/plain", msg19);
-      beep();
-      beep();
-      beep();
-      Serial.println(msg20);
     }
   });
   server.on("/set/all/off", []()
   {
-    blinkblueled();
-    clientaddress = server.client().remoteIP().toString();
-    Serial.println(msg13 + clientaddress + ".");
-    if (clientaddress == allowedaddress)
+    if (checkipaddress() == 1)
     {
       if (checkuid() == 1)
       {
@@ -319,26 +245,12 @@ void setup(void)
         vent = 0;
         server.send(200, "text/plain", msg27);
         Serial.println(msg15);
-      } else
-      {
-        server.send(401, "text/plain", msg17);
-        Serial.println(msg18);
       }
-    } else
-    {
-      server.send(401, "text/plain", msg19);
-      beep();
-      beep();
-      beep();
-      Serial.println(msg20);
     }
   });
   server.on("/set/alarm/off", []()
   {
-    blinkblueled();
-    clientaddress = server.client().remoteIP().toString();
-    Serial.println(msg13 + clientaddress + ".");
-    if (clientaddress == allowedaddress)
+    if (checkipaddress() == 1)
     {
       if (checkuid() == 1)
       {
@@ -346,26 +258,12 @@ void setup(void)
         alarm = 0;
         server.send(200, "text/plain", msg27);
         Serial.println(msg30);
-      } else
-      {
-        server.send(401, "text/plain", msg17);
-        Serial.println(msg18);
       }
-    } else
-    {
-      server.send(401, "text/plain", msg19);
-      beep();
-      beep();
-      beep();
-      Serial.println(msg20);
     }
   });
   server.on("/set/heater/off", []()
   {
-    blinkblueled();
-    clientaddress = server.client().remoteIP().toString();
-    Serial.println(msg13 + clientaddress + ".");
-    if (clientaddress == allowedaddress)
+    if (checkipaddress() == 1)
     {
       if (checkuid() == 1)
       {
@@ -373,26 +271,12 @@ void setup(void)
         heat = 0;
         server.send(200, "text/plain", msg27);
         Serial.println(msg24 + msg31);
-      } else
-      {
-        server.send(401, "text/plain", msg17);
-        Serial.println(msg18);
       }
-    } else
-    {
-      server.send(401, "text/plain", msg19);
-      beep();
-      beep();
-      beep();
-      Serial.println(msg20);
     }
   });
   server.on("/set/heater/on", []()
   {
-    blinkblueled();
-    clientaddress = server.client().remoteIP().toString();
-    Serial.println(msg13 + clientaddress + ".");
-    if (clientaddress == allowedaddress)
+    if (checkipaddress() == 1)
     {
       if (checkuid() == 1)
       {
@@ -400,26 +284,12 @@ void setup(void)
         heat = 1;
         server.send(200, "text/plain", msg27);
         Serial.println(msg24 + msg32);
-      } else
-      {
-        server.send(401, "text/plain", msg17);
-        Serial.println(msg18);
       }
-    } else
-    {
-      server.send(401, "text/plain", msg19);
-      beep();
-      beep();
-      beep();
-      Serial.println(msg20);
     }
   });
   server.on("/set/lamp/off", []()
   {
-    blinkblueled();
-    clientaddress = server.client().remoteIP().toString();
-    Serial.println(msg13 + clientaddress + ".");
-    if (clientaddress == allowedaddress)
+    if (checkipaddress() == 1)
     {
       if (checkuid() == 1)
       {
@@ -427,26 +297,12 @@ void setup(void)
         lamp = 0;
         server.send(200, "text/plain", msg27);
         Serial.println(msg25 + msg31);
-      } else
-      {
-        server.send(401, "text/plain", msg17);
-        Serial.println(msg18);
       }
-    } else
-    {
-      server.send(401, "text/plain", msg19);
-      beep();
-      beep();
-      beep();
-      Serial.println(msg20);
     }
   });
   server.on("/set/lamp/on", []()
   {
-    blinkblueled();
-    clientaddress = server.client().remoteIP().toString();
-    Serial.println(msg13 + clientaddress + ".");
-    if (clientaddress == allowedaddress)
+    if (checkipaddress() == 1)
     {
       if (checkuid() == 1)
       {
@@ -454,26 +310,12 @@ void setup(void)
         lamp = 1;
         server.send(200, "text/plain", msg27);
         Serial.println(msg25 + msg32);
-      } else
-      {
-        server.send(401, "text/plain", msg17);
-        Serial.println(msg18);
       }
-    } else
-    {
-      server.send(401, "text/plain", msg19);
-      beep();
-      beep();
-      beep();
-      Serial.println(msg20);
     }
   });
   server.on("/set/ventilator/off", []()
   {
-    blinkblueled();
-    clientaddress = server.client().remoteIP().toString();
-    Serial.println(msg13 + clientaddress + ".");
-    if (clientaddress == allowedaddress)
+    if (checkipaddress() == 1)
     {
       if (checkuid() == 1)
       {
@@ -481,26 +323,12 @@ void setup(void)
         vent = 0;
         server.send(200, "text/plain", msg27);
         Serial.println(msg26 + msg31);
-      } else
-      {
-        server.send(401, "text/plain", msg17);
-        Serial.println(msg18);
       }
-    } else
-    {
-      server.send(401, "text/plain", msg19);
-      beep();
-      beep();
-      beep();
-      Serial.println(msg20);
     }
   });
   server.on("/set/ventilator/on", []()
   {
-    blinkblueled();
-    clientaddress = server.client().remoteIP().toString();
-    Serial.println(msg13 + clientaddress + ".");
-    if (clientaddress == allowedaddress)
+    if (checkipaddress() == 1)
     {
       if (checkuid() == 1)
       {
@@ -508,18 +336,7 @@ void setup(void)
         vent = 1;
         server.send(200, "text/plain", msg27);
         Serial.println(msg26 + msg32);
-      } else
-      {
-        server.send(401, "text/plain", msg17);
-        Serial.println(msg18);
       }
-    } else
-    {
-      server.send(401, "text/plain", msg19);
-      beep();
-      beep();
-      beep();
-      Serial.println(msg20);
     }
   });
   server.begin();
@@ -570,35 +387,50 @@ void loop(void)
   portwrite();
 }
 
+// error 404
 void handleNotFound()
 {
   server.send(404, "text/plain", msg21);
   Serial.println(msg22);
 }
 
-// blink blue LED
-void blinkblueled()
+// blink blue LED and write client IP address to serial console
+void writeclientipaddress()
 {
   digitalWrite(prt_led_blue, HIGH);
   delay(500);
   digitalWrite(prt_led_blue, LOW);
+  clientaddress = server.client().remoteIP().toString();
+  Serial.println(msg13 + clientaddress + ".");
 }
 
-// read inputs
-void portread()
+// check IP address of client
+int checkipaddress()
 {
-  swmanu = digitalRead(prt_in_swmanu);
-  ocprot = digitalRead(prt_in_ocprot);
-  opmode = digitalRead(prt_in_opmode);
-}
-
-// write outputs
-void portwrite()
-{
-  digitalWrite(prt_led_red, error);
-  digitalWrite(prt_out_lamp, lamp);
-  digitalWrite(prt_out_vent, vent);
-  digitalWrite(prt_out_heat, heat);
+  int allowed = 0;
+  writeclientipaddress();
+  StringSplitter *splitter = new StringSplitter(allowedaddress, ' ', 3);
+  int itemCount = splitter->getItemCount();
+  for (int i = 0; i < itemCount; i++)
+  {
+    String item = splitter->getItemAtIndex(i);
+    if (clientaddress == String(item))
+    {
+      allowed = 1;
+    }
+  }
+  if (allowed == 1)
+  {
+    return 1;
+  } else
+  {
+    server.send(401, "text/plain", msg19);
+    Serial.println(msg20);
+    beep();
+    beep();
+    beep();
+    return 0;
+  }
 }
 
 // authentication
@@ -609,6 +441,8 @@ int checkuid()
     return 1;
   } else
   {
+    server.send(401, "text/plain", msg17);
+    Serial.println(msg18);
     beep();
     beep();
     return 0;
@@ -622,4 +456,21 @@ void beep()
   delay (100);
   noTone(prt_buzzer);
   delay (100);
+}
+
+// read input ports
+void portread()
+{
+  swmanu = digitalRead(prt_in_swmanu);
+  ocprot = digitalRead(prt_in_ocprot);
+  opmode = digitalRead(prt_in_opmode);
+}
+
+// write output ports
+void portwrite()
+{
+  digitalWrite(prt_led_red, error);
+  digitalWrite(prt_out_lamp, lamp);
+  digitalWrite(prt_out_vent, vent);
+  digitalWrite(prt_out_heat, heat);
 }

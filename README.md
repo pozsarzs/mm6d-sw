@@ -11,3 +11,7 @@ GitHub: <https://github.com/pozsarzs/mm6d-sw>
  - language:           en
  - licence:            EUPL v1.1
  - user interface:     CUI via serial console and webpage
+
+**External libraries in package**
+
+ - Arduino String Splitter Library v1.0.0 by Harsha Alva

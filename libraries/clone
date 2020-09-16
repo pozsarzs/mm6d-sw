@@ -1,0 +1,9 @@
+#!/bin/bash
+# +----------------------------------------------------------------------------+
+# | MM6D v0.1 * Remote controlled switching device                             |
+# | Copyright (C) 2020 Pozsár Zsolt <pozsar.zsolt@szerafingomba.hu>            |
+# | clone                                                                      |
+# | Clone libraries from Github                                                |
+# +----------------------------------------------------------------------------+
+
+git clone https://github.com/aharshac/StringSplitter.git
