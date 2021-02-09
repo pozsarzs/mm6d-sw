@@ -1,5 +1,5 @@
 **MM6D * Remote controlled switching device**  
-Copyright (C) 2020 Pozsár Zsolt <pozsar.zsolt@szerafingomba.hu>  
+Copyright (C) 2020-2021 Pozsár Zsolt <pozsar.zsolt@szerafingomba.hu>  
 Homepage: <http://www.szerafingomba.hu/softwares/>  
 GitHub: <https://github.com/pozsarzs/mm6d-sw>
 
@@ -7,7 +7,7 @@ GitHub: <https://github.com/pozsarzs/mm6d-sw>
 
  - architecture:       xtensa
  - operation system:   -
- - version:            v0.1
+ - version:            v0.2
  - language:           en
  - licence:            EUPL v1.1
  - user interface:     CUI via serial console and webpage

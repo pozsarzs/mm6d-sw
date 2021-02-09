@@ -1,0 +1,12 @@
+mm6d (0.2) unstable; urgency=low
+
+  * Added a new combined "set and get" function.
+  * Detailed and some new messages on console.
+
+ -- Pozsar Zsolt <pozsar.zsolt@szerafingomba.hu>  Tue, 09 Feb 2021 19:59:11
+
+mm6d (0.1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Pozsar Zsolt <pozsar.zsolt@szerafingomba.hu>  Wed, 16 Sep 2020 13:11:02
