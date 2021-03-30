@@ -1,13 +1,120 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
-    <title>MM6D * Remote controlled switching device | Controller test page</title>
+    <title>MM6D * Remote controlled switching device | Test page</title>
   </head>
-  <frameset rows="95%,5%">
-    <frame name="body" src="body.html" />
-    <frame name="bottom" src="bottom.html" />
-    <noframes>
-      <body>Your browser does not support frames.</body>
-    </noframes>
-  </frameset>
+  <body bgcolor="#e2f4fd" font style="font-family:'sans'">
+    <script type="text/javascript">
+      function OpenPage1() {
+        var ipaddress = document.getElementById('ipaddress').value;
+        var uid = document.getElementById('uid').value;
+        var page = document.querySelector('input[name = "page"]:checked').value;
+        window.open ("http://" + ipaddress + page + "?uid=" + uid, target='_blank');
+      }
+      function OpenPage2()
+      {
+        var ipaddress = document.getElementById('ipaddress').value;
+        var uid = document.getElementById('uid').value;
+        var a = document.getElementById('a').value;
+        var h = document.getElementById('h').value;
+        var l = document.getElementById('l').value;
+        var v = document.getElementById('v').value;
+        var page = document.querySelector('input[name = "page"]:checked').value;
+        window.open ("http://" + ipaddress + page + "?uid=" + uid + "&a=" + a + "&h=" + h + "&hl=" + l + "&v=" + v, target='_blank');
+      }
+    </script>
+    <fieldset>
+      <legend>&nbsp;Controller&nbsp;</legend>
+      <label for="ipaddress">IP address of controller:</label><br>
+      <input type="text" id="ipaddress" /><br>
+      <label for="uid">UID:</label><br>
+      <input type="text" id="uid" /><br>
+    </fieldset>
+    <br>
+    <fieldset>
+      <legend>&nbsp;Information pages&nbsp;</legend>
+      <input type="radio" id="page0" name="page" value="">
+      <label for="page0">Show help page</label><br>
+      <input type="radio" id="page1" name="page" value="/summary">
+      <label for="page1">Show summary of status</label><br>
+      <input type="radio" id="page2" name="page" value="/log">
+      <label for="page2">Show system log</label><br>
+      <input type="radio" id="page3" name="page" value="/version">
+      <label for="page3">Show device information</label><br>
+      <br>
+      <input type="submit" value="Submit" onclick="OpenPage1();" />
+    </fieldset>
+    <br>
+    <fieldset>
+      <legend>&nbsp;Alarm&nbsp;</legend>
+      <input type="radio" id="page4" name="page" value="/get/alarm">
+      <label for="page4">Get alarm status</label><br>
+      <input type="radio" id="page5" name="page" value="/set/alarm/off">
+      <label for="page5">Restore alarm status</label><br>
+      <br>
+      <input type="submit" value="Submit" onclick="OpenPage1();" />
+    </fieldset>
+    <br>
+    <fieldset>
+      <legend>&nbsp;Get data&nbsp;</legend>
+      <input type="radio" id="page6" name="page" value="/get/all">
+      <label for="page6">Get all status</label><br>
+      <input type="radio" id="page7" name="page" value="/get/operationmode">
+      <label for="page7">Get status of operation mode switch</label><br>
+      <input type="radio" id="page8" name="page" value="/get/manualswitch">
+      <label for="page8">Get status of manual mode switches</label><br>
+      <input type="radio" id="page9" name="page" value="/get/protection">
+      <label for="page9">Get status of overcurrent protection</label><br>
+      <input type="radio" id="page10" name="page" value="/get/lamp">
+      <label for="page10">Get status of lamp output</label><br>
+      <input type="radio" id="page11" name="page" value="/get/ventilator">
+      <label for="page11">Get status of ventilator output</label><br>
+      <input type="radio" id="page12" name="page" value="/get/heater">
+      <label for="page12">Get status of heater output</label><br>
+      <br>
+      <input type="submit" value="Submit" onclick="OpenPage1();" />
+    </fieldset>
+    <br>
+    <fieldset>
+      <legend>&nbsp;Operation&nbsp;</legend>
+      <input type="checkbox" id="a" name="a" value="on"/><label for="a"> Restore alarm</label><br>
+      <br>
+      <input type="checkbox" id="l" name="l" value="on"/><label for="a"> Switch on/off lamp</label><br>
+      <input type="checkbox" id="v" name="v" value="on"/><label for="a"> Switch on/off ventilator</label><br>
+      <input type="checkbox" id="h" name="h" value="on"/><label for="a"> Switch on/off heater</label><br>
+      <br>
+      <input type="radio" id="page14" name="page" value="/operation">
+      <label for="page14">Get all data and set status of outputs</label><br>
+      <br>
+      <input type="submit" value="Submit" onclick="OpenPage2();" />
+    </fieldset>
+    <br>
+    <fieldset>
+      <legend>&nbsp;Manual operation&nbsp;</legend>
+      <input type="radio" id="page13" name="page" value="/set/all/off">
+      <label for="page13">Switch off all outputs</label><br>
+      <input type="radio" id="page14" name="page" value="/set/lamp/off">
+      <label for="page14">Switch off lamp</label><br>
+      <input type="radio" id="page15" name="page" value="/set/lamp/on">
+      <label for="page15">Switch on lamp</label><br>
+      <input type="radio" id="page16" name="page" value="/set/ventilator/off">
+      <label for="page16">Switch off ventilator</label><br>
+      <input type="radio" id="page17" name="page" value="/set/ventilator/on">
+      <label for="page17">Switch on ventilator</label><br>
+      <input type="radio" id="page18" name="page" value="/set/heater/off">
+      <label for="page18">Switch off heater</label><br>
+      <input type="radio" id="page19" name="page" value="/set/heater/on">
+      <label for="page19">Switch on heater</label><br>
+      <br>
+      <input type="submit" value="Submit" onclick="OpenPage1();" />
+    </fieldset>
+    <center>
+      <br>
+      Copyright (C) 2020-2021 <a href="pozsar.zsolt@szerafingomba.hu">Pozsar Zsolt</a> *
+      <a href="http://www.szerafingomba.hu/softwares/">Homepage</a> * 
+      <a href="https://github.com/pozsarzs/mm6d-sw">GitHub</a>
+      <br>
+      <br>
+    </center>
+  </body>
 </html>
