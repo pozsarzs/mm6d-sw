@@ -9,18 +9,22 @@
         var ipaddress = document.getElementById('ipaddress').value;
         var uid = document.getElementById('uid').value;
         var page = document.querySelector('input[name = "page"]:checked').value;
-        window.open ("http://" + ipaddress + page + "?uid=" + uid, target='_blank');
+        window.open ("http://" + ipaddress + page + "?uid=" + uid, target='bottom');
       }
       function OpenPage2()
       {
         var ipaddress = document.getElementById('ipaddress').value;
         var uid = document.getElementById('uid').value;
-        var a = document.getElementById('a').value;
-        var h = document.getElementById('h').value;
-        var l = document.getElementById('l').value;
-        var v = document.getElementById('v').value;
+        var va = document.getElementById('a');
+        var vh = document.getElementById('h');
+        var vl = document.getElementById('l');
+        var vv = document.getElementById('v');
         var page = document.querySelector('input[name = "page"]:checked').value;
-        window.open ("http://" + ipaddress + page + "?uid=" + uid + "&a=" + a + "&h=" + h + "&hl=" + l + "&v=" + v, target='_blank');
+        if (va.checked) a=1; else a=0;
+        if (vh.checked) h=1; else h=0;
+        if (vl.checked) l=1; else l=0;
+        if (vv.checked) v=1; else v=0;
+        window.open ("http://" + ipaddress + page + "?uid=" + uid + "&a=" + a + "&h=" + h + "&l=" + l + "&v=" + v, target='bottom');
       }
     </script>
     <fieldset>
@@ -77,34 +81,34 @@
     <br>
     <fieldset>
       <legend>&nbsp;Operation&nbsp;</legend>
-      <input type="checkbox" id="a" name="a" value="on"/><label for="a"> Restore alarm</label><br>
+      <input type="checkbox" id="a" name="a" value="1"/><label for="a"> Restore alarm</label><br>
       <br>
-      <input type="checkbox" id="l" name="l" value="on"/><label for="a"> Switch on/off lamp</label><br>
-      <input type="checkbox" id="v" name="v" value="on"/><label for="a"> Switch on/off ventilator</label><br>
-      <input type="checkbox" id="h" name="h" value="on"/><label for="a"> Switch on/off heater</label><br>
+      <input type="checkbox" id="l" name="l" value="1"/><label for="l"> Switch on/off lamp</label><br>
+      <input type="checkbox" id="v" name="v" value="1"/><label for="v"> Switch on/off ventilator</label><br>
+      <input type="checkbox" id="h" name="h" value="1"/><label for="h"> Switch on/off heater</label><br>
       <br>
-      <input type="radio" id="page14" name="page" value="/operation">
-      <label for="page14">Get all data and set status of outputs</label><br>
+      <input type="radio" id="page13" name="page" value="/operation">
+      <label for="page13">Get all data and set status of outputs</label><br>
       <br>
       <input type="submit" value="Submit" onclick="OpenPage2();" />
     </fieldset>
     <br>
     <fieldset>
       <legend>&nbsp;Manual operation&nbsp;</legend>
-      <input type="radio" id="page13" name="page" value="/set/all/off">
-      <label for="page13">Switch off all outputs</label><br>
-      <input type="radio" id="page14" name="page" value="/set/lamp/off">
-      <label for="page14">Switch off lamp</label><br>
-      <input type="radio" id="page15" name="page" value="/set/lamp/on">
-      <label for="page15">Switch on lamp</label><br>
-      <input type="radio" id="page16" name="page" value="/set/ventilator/off">
-      <label for="page16">Switch off ventilator</label><br>
-      <input type="radio" id="page17" name="page" value="/set/ventilator/on">
-      <label for="page17">Switch on ventilator</label><br>
-      <input type="radio" id="page18" name="page" value="/set/heater/off">
-      <label for="page18">Switch off heater</label><br>
-      <input type="radio" id="page19" name="page" value="/set/heater/on">
-      <label for="page19">Switch on heater</label><br>
+      <input type="radio" id="page14" name="page" value="/set/all/off">
+      <label for="page14">Switch off all outputs</label><br>
+      <input type="radio" id="page15" name="page" value="/set/lamp/off">
+      <label for="page15">Switch off lamp</label><br>
+      <input type="radio" id="page16" name="page" value="/set/lamp/on">
+      <label for="page16">Switch on lamp</label><br>
+      <input type="radio" id="page17" name="page" value="/set/ventilator/off">
+      <label for="page17">Switch off ventilator</label><br>
+      <input type="radio" id="page18" name="page" value="/set/ventilator/on">
+      <label for="page18">Switch on ventilator</label><br>
+      <input type="radio" id="page19" name="page" value="/set/heater/off">
+      <label for="page19">Switch off heater</label><br>
+      <input type="radio" id="page20" name="page" value="/set/heater/on">
+      <label for="page20">Switch on heater</label><br>
       <br>
       <input type="submit" value="Submit" onclick="OpenPage1();" />
     </fieldset>

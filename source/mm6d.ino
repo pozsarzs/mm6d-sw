@@ -102,7 +102,7 @@ String msg[60]                  =
   /* 32 */  " on.",
   /* 33 */  "Serial number of hardware: ",
   /* 34 */  "  get homepage",
-  /* 35 */  "  get version data",
+  /* 35 */  "  get device information",
   /* 36 */  "  get all data, restore alarm and set outputs",
   /* 37 */  "  get all data",
   /* 38 */  "  get alarm status",
@@ -117,7 +117,7 @@ String msg[60]                  =
   /* 47 */  "    protection:\t",
   /* 48 */  "* HTTP request received.",
   /* 49 */  "  get summary",
-  /* 50 */  "  get system log"
+  /* 50 */  "  get system log",
   /* 51 */  "  get status of lamp output",
   /* 52 */  "  get status of ventilator output",
   /* 53 */  "  get status of heater output",
@@ -350,29 +350,29 @@ void setup(void)
           "      <tr>\n"
           "        <td>Alarm event:</td>\n"
           "        <td>";
-        if (lamp == 1) line = line + "Detected"; else line = line + "Not detected";
-        line = line +
-          "        </td>\n"
-          "      </tr>\n"
-          "      <tr><td colspan=\"3\" align=\"center\"><b>Status</b></td></tr>\n"
-          "      <tr>\n"
-          "        <td>Operation mode:</td>\n"
-          "        <td>";
-        if (lamp == 1) line = line + "Mushroom"; else line = line + "Hyphae";
+        if (alarm == 1) line = line + "Detected"; else line = line + "Not detected";
         line = line +
                "        </td>\n"
                "      </tr>\n"
-          "      <tr>\n"
-          "        <td>Manual mode:</td>\n"
-          "        <td>";
-        if (lamp == 1) line = line + "ON"; else line = line + "OFF";
+               "      <tr><td colspan=\"3\" align=\"center\"><b>Status</b></td></tr>\n"
+               "      <tr>\n"
+               "        <td>Operation mode:</td>\n"
+               "        <td>";
+        if (opmode == 1) line = line + "Hyphae"; else line = line + "Mushroom";
         line = line +
                "        </td>\n"
                "      </tr>\n"
-          "      <tr>\n"
-          "        <td>Overcurrent protection:</td>\n"
-          "        <td>";
-        if (lamp == 1) line = line + "Closed"; else line = line + "Opened";
+               "      <tr>\n"
+               "        <td>Manual mode:</td>\n"
+               "        <td>";
+        if (swmanu == 1) line = line + "ON"; else line = line + "OFF";
+        line = line +
+               "        </td>\n"
+               "      </tr>\n"
+               "      <tr>\n"
+               "        <td>Overcurrent protection:</td>\n"
+               "        <td>";
+        if (ocprot == 1) line = line + "Opened"; else line = line + "Closed";
         line = line +
                "        </td>\n"
                "      </tr>\n"
@@ -394,8 +394,7 @@ void setup(void)
                "      <tr>\n"
                "        <td>Heater:</td>\n"
                "        <td>";
-        if (heat
-        == 1) line = line + "ON"; else line = line + "OFF";
+        if (heat == 1) line = line + "ON"; else line = line + "OFF";
         line = line +
                "        </td>\n"
                "      </tr>\n"
@@ -776,18 +775,21 @@ void loop(void)
   if ((timeout == 1) && (timeoutsign == 0))
   {
     Serial.println(msg[14]);
+    writesyslog(14);
     timeoutsign = 1;
   }
   if (alarm == 0) alarmsign = 0;
   if ((alarm == 1) && (alarmsign == 0))
   {
     Serial.println(msg[15]);
+    writesyslog(15);
     alarmsign = 1;
   }
   if (ocprot == 0) ocprotsign = 0;
   if ((ocprot == 1) && (ocprotsign == 0))
   {
     Serial.println(msg[23]);
+    writesyslog(23);
     ocprotsign = 1;
   }
   // error sound
