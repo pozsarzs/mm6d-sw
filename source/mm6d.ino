@@ -457,7 +457,7 @@ void setup(void)
   });
 
   // Group #2: alarm
-  // Get alarm status
+  // get alarm status
   server.on("/get/alarm", []()
   {
     if (checkipaddress() == 1)
@@ -472,7 +472,7 @@ void setup(void)
         server.send(200, textplain, line);
       }
   });
-  // Restore alarm status
+  // restore alarm status
   server.on("/set/alarm/off", []()
   {
     if (checkipaddress() == 1)

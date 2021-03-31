@@ -9,7 +9,7 @@
         var ipaddress = document.getElementById('ipaddress').value;
         var uid = document.getElementById('uid').value;
         var page = document.querySelector('input[name = "page"]:checked').value;
-        window.open ("http://" + ipaddress + page + "?uid=" + uid, target='bottom');
+        window.open ("http://" + ipaddress + page + "?uid=" + uid, target = 'bottom');
       }
       function OpenPage2()
       {
@@ -20,11 +20,11 @@
         var vl = document.getElementById('l');
         var vv = document.getElementById('v');
         var page = document.querySelector('input[name = "page"]:checked').value;
-        if (va.checked) a=1; else a=0;
-        if (vh.checked) h=1; else h=0;
-        if (vl.checked) l=1; else l=0;
-        if (vv.checked) v=1; else v=0;
-        window.open ("http://" + ipaddress + page + "?uid=" + uid + "&a=" + a + "&h=" + h + "&l=" + l + "&v=" + v, target='bottom');
+        if (va.checked) a = 1; else a = 0;
+        if (vh.checked) h = 1; else h = 0;
+        if (vl.checked) l = 1; else l = 0;
+        if (vv.checked) v = 1; else v = 0;
+        window.open ("http://" + ipaddress + page + "?uid=" + uid + "&a=" + a + "&h=" + h + "&l=" + l + "&v=" + v, target = 'bottom');
       }
     </script>
     <fieldset>

@@ -1,8 +1,12 @@
 mm6d (0.3) unstable; urgency=low
 
-  * Added...
+  * New help page.
+  * Added system log page.
+  * Added status page.
+  * Added output status get pages.
+  * New test page in testpage directory.
 
- -- Pozsar Zsolt <pozsar.zsolt@szerafingomba.hu>  Thu, 01 Apr 2021 00:00:00
+ -- Pozsar Zsolt <pozsar.zsolt@szerafingomba.hu>  Wed, 31 Mar 2021 17:37:02
 
 mm6d (0.2) unstable; urgency=low
 
