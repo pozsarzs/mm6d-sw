@@ -114,7 +114,7 @@ String msg[60]                  =
   /* 44 */  "    alarm:\t\t",
   /* 45 */  "    operation mode:\t",
   /* 46 */  "    manual switch:\t",
-  /* 47 */  "    protection:\t",
+  /* 47 */  "    protection:\t\t",
   /* 48 */  "* HTTP request received.",
   /* 49 */  "  get summary",
   /* 50 */  "  get system log",
@@ -457,7 +457,7 @@ void setup(void)
   });
 
   // Group #2: alarm
-  // get alarm status
+  // Get alarm status
   server.on("/get/alarm", []()
   {
     if (checkipaddress() == 1)
@@ -472,7 +472,7 @@ void setup(void)
         server.send(200, textplain, line);
       }
   });
-  // restore alarm status
+  // Restore alarm status
   server.on("/set/alarm/off", []()
   {
     if (checkipaddress() == 1)
