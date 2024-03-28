@@ -41,12 +41,11 @@ const int     PRT_DO_LAMP       = 14;
 const int     PRT_DO_VENT       = 15;
 
 // name of the Modbus registers
-const String  COIL_NAME[4]      =
+const String  COIL_NAME[3]      =
 {
-  /* 00001 */       "state",
-  /* 00002 */       "lamp",
-  /* 00003 */       "vent",
-  /* 00004 */       "heat",
+  /* 00001 */       "lamp",
+  /* 00002 */       "vent",
+  /* 00003 */       "heat",
 };
 const String  DI_NAME[8]        =
 {
@@ -70,7 +69,8 @@ const String  HR_NAME[6]        =
 };
 
 // other constants
-const long    INTERVAL          = 10000;
+const long    TIME_LOOP         = 100; // in ms
+const long    TIME_TIMEOUT      = 10000; // in ms
 const String  SWNAME            = "MM6D";
 const String  SWVERSION         = "0.4.0";
 const String  TEXTHTML          = "text/html";
@@ -84,7 +84,9 @@ String        htmlheader;
 String        line;
 String        myipaddress       = "0.0.0.0";
 String        mymacaddress      = "00:00:00:00:00:00";
-unsigned long prevtime          = 0;
+unsigned long currtime;
+unsigned long prevtime_loop     = 0;
+unsigned long prevtime_timeout  = 0;
 
 // messages
 const String  MSG[61]           =
@@ -158,15 +160,16 @@ const String  COIL_DESC[4]      =
   /*  2 */  "status of the ventilator output",
   /*  3 */  "status of the heater output"
 };
-const String  DI_DESC[7]        =
+const String  DI_DESC[8]        =
 {
   /*  0 */  "general error",
   /*  1 */  "alarm",
   /*  2 */  "overcurrent breaker (1: error)",
-  /*  3 */  "stand-by operation mode",
-  /*  4 */  "growing hyphae operation mode",
-  /*  5 */  "growing mushroom operation mode",
-  /*  6 */  "manual switch (0/1: auto/manual)",
+  /*  3 */  "connection timeout error",
+  /*  4 */  "stand-by operation mode",
+  /*  5 */  "growing hyphae operation mode",
+  /*  6 */  "growing mushroom operation mode",
+  /*  7 */  "manual switch (0/1: auto/manual)",
 };
 
 ESP8266WebServer httpserver(80);
@@ -295,12 +298,11 @@ void getinputs()
   // manual mode switch
   mbrtu.Ists(7, digitalRead(PRT_DI_SWMANU)); // -> 10008
   // general error
-  gen_error = gen_error || mbrtu.Ists(1);
-  gen_error = gen_error || mbrtu.Ists(2);
-  gen_error = gen_error || mbrtu.Ists(3);
-  gen_error = gen_error || mbrtu.Ists(7);
+  gen_error = gen_error || mbrtu.Ists(1); // alarm
+  gen_error = gen_error || mbrtu.Ists(2); // breaker
+  gen_error = gen_error || mbrtu.Ists(3); // timeout
+  gen_error = gen_error || mbrtu.Ists(7); // manual
   mbrtu.Ists(0, gen_error); // -> 10001
-  mbrtu.Coil(0, ! mbrtu.Ists(0)); // -> 00001
   logmbquery = true;
 }
 
@@ -308,17 +310,17 @@ void getinputs()
 void setoutputs()
 {
   logmbquery = false;
-  digitalWrite(PRT_DO_STATUS, mbrtu.Coil(0));
-  if (mbrtu.Ists(4) || mbrtu.Ists(3))
+  digitalWrite(PRT_DO_STATUS, ! mbrtu.Ists(0));
+  if (mbrtu.Ists(4) || mbrtu.Ists(3)) // standby or timeout
   {
     digitalWrite(PRT_DO_LAMP, false);
     digitalWrite(PRT_DO_VENT, false);
     digitalWrite(PRT_DO_HEAT, false);
   } else
   {
-    digitalWrite(PRT_DO_LAMP, mbrtu.Coil(1));
-    digitalWrite(PRT_DO_VENT, mbrtu.Coil(2));
-    digitalWrite(PRT_DO_HEAT, mbrtu.Coil(3));
+    digitalWrite(PRT_DO_LAMP, mbrtu.Coil(0));
+    digitalWrite(PRT_DO_VENT, mbrtu.Coil(1));
+    digitalWrite(PRT_DO_HEAT, mbrtu.Coil(2));
   }
   logmbquery = true;
 }
@@ -329,6 +331,7 @@ void httpquery()
 {
   blinkblueled();
   writetosyslog(19);
+  prevtime_timeout = currtime;
 }
 
 uint16_t modbusquery(TRegister* reg, uint16_t val)
@@ -337,6 +340,7 @@ uint16_t modbusquery(TRegister* reg, uint16_t val)
   {
     blinkblueled();
     writetosyslog(60);
+    prevtime_timeout = currtime;
   }
   return val;
 }
@@ -439,7 +443,7 @@ void handleHelp()
          "        <td>" + TEXTPLAIN + "</td>\n"
          "      </tr>\n"
          "      <tr>\n"
-         "        <td><a href=\"http://" + myipaddress + "/set?state=0&lamp=0&vent=0&heat=0\">http://" + myipaddress + "/set?state=0&lamp=0&vent=0&heat=0</a></td>\n"
+         "        <td><a href=\"http://" + myipaddress + "/set?lamp=0&vent=0&heat=0\">http://" + myipaddress + "/set?lamp=0&vent=0&heat=0</a></td>\n"
          "        <td>" + MSG[59] + "</td>\n"
          "        <td>" + TEXTPLAIN + "</td>\n"
          "      </tr>\n"
@@ -455,7 +459,7 @@ void handleHelp()
       "      </tr>\n";
   }
   line += "      <tr><td colspan=\"3\"><i>" + MSG[39] + "</i></td>\n";
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < 3; i++)
   {
     s = COIL_DESC[i];
     line +=
@@ -526,7 +530,7 @@ void handleSummary()
          "    <br>\n" + htmlheader + "    <hr>\n"
          "    <h3>" + MSG[49] + "</h3>\n"
          "    <table border=\"1\" cellpadding=\"3\" cellspacing=\"0\">\n";
-  for (int i = 0; i < 7; i++)
+  for (int i = 0; i < 8; i++)
   {
     line +=
       "      <tr>\n"
@@ -534,7 +538,7 @@ void handleSummary()
       "        <td align=\"right\">" + String(mbrtu.Ists(i)) + "</td>\n"
       "      </tr>\n";
   }
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < 3; i++)
   {
     line +=
       "      <tr>\n"
@@ -599,9 +603,9 @@ void handleGetCSV()
          "\"" + HR_NAME[3] + "\",\"" + myipaddress + "\"\n"
          "\"" + HR_NAME[4] + "\",\"" + String(MB_UID) + "\"\n"
          "\"" + HR_NAME[5] + "\",\"" + String(COM_SPEED) + "\"\n";
-  for (int i = 0; i < 7; i++)
+  for (int i = 0; i < 8; i++)
     line += "\"" + DI_NAME[i] + "\",\"" + String(mbrtu.Ists(i)) + "\"\n";
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < 3; i++)
     line += "\"" + COIL_NAME[i] + "\",\"" + String(mbrtu.Coil(i)) + "\"\n";
   httpserver.send(200, TEXTPLAIN, line);
   delay(100);
@@ -625,12 +629,12 @@ void handleGetJSON()
          "  },\n"
     "  \"data\": {\n"
     "    \"bit\": {\n";
-  for (int i = 0; i < 7; i++)
+  for (int i = 0; i < 8; i++)
   {
     line += "      \"" + DI_NAME[i] + "\": \"" + String(mbrtu.Ists(i));
     if (i < 21 ) line += "\",\n"; else  line += "\"\n";
   }
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < 3; i++)
   {
     line += "      \"" + COIL_NAME[i] + "\": \"" + String(mbrtu.Coil(i));
     if (i < 21 ) line += "\",\n"; else  line += "\"\n";
@@ -654,9 +658,9 @@ void handleGetTXT()
          myipaddress + "\n" + \
          String(MB_UID) + "\n" + \
          String(COM_SPEED) + "\n";
-  for (int i = 0; i < 7; i++)
+  for (int i = 0; i < 8; i++)
     line += String(mbrtu.Ists(i)) + "\n";
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < 3; i++)
     line += String(mbrtu.Coil(i)) + "\n";
   httpserver.send(200, TEXTPLAIN, line);
   delay(100);
@@ -680,9 +684,9 @@ void handleGetXML()
          "  </hardware>\n"
          "  <data>\n"
          "    <bit>\n";
-  for (int i = 0; i < 7; i++)
+  for (int i = 0; i < 8; i++)
     line += "      <" + DI_NAME[i] + ">" + String(mbrtu.Ists(i)) + "</" + DI_NAME[i] + ">\n";
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < 3; i++)
     line += "      <" + COIL_NAME[i] + ">" + String(mbrtu.Coil(i)) + "</" + COIL_NAME[i] + ">\n";
   line +=
          "    </bit>\n"
@@ -695,32 +699,18 @@ void handleGetXML()
 // get all measured values in XML format
 void handleSetCoils()
 {
+  const String  ARGS[3] = {"lamp", "vent","heat"};
   String arg;
   httpquery;
   writetosyslog(59);
-  arg = httpserver.arg("state");
-  if (arg.length() != 0)
+  for (int i = 0; i < 3; i++)
   {
-    if (arg == "0") mbrtu.Coil(0, false);
-    if (arg == "1") mbrtu.Coil(0, true);
-  }
-  arg = httpserver.arg("lamp");
-  if (arg.length() != 0)
-  {
-    if (arg == "0") mbrtu.Coil(1, false);
-    if (arg == "1") mbrtu.Coil(1, true);
-  }
-  arg = httpserver.arg("vent");
-  if (arg.length() != 0)
-  {
-    if (arg == "0") mbrtu.Coil(2, false);
-    if (arg == "1") mbrtu.Coil(2, true);
-  }
-  arg = httpserver.arg("heat");
-  if (arg.length() != 0)
-  {
-    if (arg == "0") mbrtu.Coil(3, false);
-    if (arg == "1") mbrtu.Coil(3, true);
+    arg = httpserver.arg(ARGS[i]);
+    if (arg.length() != 0)
+    {
+      if (arg == "0") mbrtu.Coil(i, false);
+      if (arg == "1") mbrtu.Coil(i, true);
+    }
   }
   line = "";
   for (uint8_t i = 0; i < httpserver.args(); i++ )
@@ -757,11 +747,20 @@ void setup(void)
   // initialize GPIO ports
   writetosyslog(5);
   if (SERIAL_CONSOLE) Serial.println(MSG[5]);
+  pinMode(PRT_DI_ALARM, INPUT);
+  pinMode(PRT_DI_OCPROT, INPUT);
+  pinMode(PRT_DI_SWMANU, INPUT);
   pinMode(PRT_DO_BUZZER, OUTPUT);
   pinMode(PRT_DO_LEDBLUE, OUTPUT);
   pinMode(PRT_DO_STATUS, OUTPUT);
+  pinMode(PRT_DO_LAMP, OUTPUT);
+  pinMode(PRT_DO_VENT, OUTPUT);
+  pinMode(PRT_DO_HEAT, OUTPUT);
   digitalWrite(PRT_DO_LEDBLUE, LOW);
   digitalWrite(PRT_DO_STATUS, LOW);
+  digitalWrite(PRT_DO_LAMP, LOW);
+  digitalWrite(PRT_DO_VENT, LOW);
+  digitalWrite(PRT_DO_HEAT, LOW);
   // connect to wireless network
   if (HTTP || MODBUS_TCP)
   {
@@ -839,10 +838,11 @@ void setup(void)
 void loop(void)
 {
   if (HTTP) httpserver.handleClient();
-  unsigned long currtime = millis();
-  if (currtime - prevtime >= INTERVAL)
+  currtime = millis();
+  if (currtime - prevtime_timeout >= TIME_TIMEOUT) mbrtu.Ists(3, true); else mbrtu.Ists(3, false);
+  if (currtime - prevtime_loop >= TIME_LOOP)
   {
-    prevtime = currtime;
+    prevtime_loop = currtime;
     getinputs();
     setoutputs();
   }
