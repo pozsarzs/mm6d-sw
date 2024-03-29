@@ -25,9 +25,8 @@ const bool    HTTP              = true;           // enable/disable HTTP access
 const bool    MODBUS_TCP        = true;           // enable/disable Modbus/TCP access
 const int     COM_SPEED         = 9600;           // baudrate of the serial port
 const int     MB_UID            = 1;              // Modbus UID
-const char   *WIFI_SSID         = "";             // Wifi SSID
-const char   *WIFI_PASSWORD     = "";             // Wifi password
-
+  const char   *WIFI_SSID         = "";           // Wifi SSID
+  const char   *WIFI_PASSWORD     = "";           // Wifi password
 // ports
 const int     PRT_AI_OPMODE     = 0;
 const int     PRT_DI_ALARM      = 5;
@@ -70,7 +69,7 @@ const String  HR_NAME[6]        =
 
 // other constants
 const long    TIME_LOOP         = 100; // in ms
-const long    TIME_TIMEOUT      = 10000; // in ms
+const long    TIME_TIMEOUT      = 60000; // in ms
 const String  SWNAME            = "MM6D";
 const String  SWVERSION         = "0.4.0";
 const String  TEXTHTML          = "text/html";
@@ -290,10 +289,11 @@ void getinputs()
   // overcurrent protection (breakers)
   mbrtu.Ists(2, digitalRead(PRT_DI_OCPROT)); // -> 10003
   // operation mode
-  for (int i = 4; i < 7; i++) mbrtu.Ists(i, false);
   ai_opmode = int(analogRead(PRT_AI_OPMODE));
-  if (ai_opmode < 100) mbrtu.Ists(4, true); else
-    if (ai_opmode > 900) mbrtu.Ists(6, true); else mbrtu.Ists(5, true); // -> 10004-10006
+  for (int i = 4; i < 7; i++) mbrtu.Ists(i, false);
+  if (ai_opmode > 850) mbrtu.Ists(4, true); // -> 10005
+  if (ai_opmode < 150) mbrtu.Ists(5, true); // -> 10006
+  if ((ai_opmode > 150) && (ai_opmode < 850)) mbrtu.Ists(6, true); // -> 10007
   // manual mode switch
   mbrtu.Ists(7, digitalRead(PRT_DI_SWMANU)); // -> 10008
   // general error
@@ -309,7 +309,7 @@ void getinputs()
 void setoutputs()
 {
   logmbquery = false;
-  digitalWrite(PRT_DO_STATUS, ! mbrtu.Ists(0));
+  digitalWrite(PRT_DO_STATUS, mbrtu.Ists(0));
   if (mbrtu.Ists(4) || mbrtu.Ists(3)) // standby or timeout
   {
     digitalWrite(PRT_DO_LAMP, false);
@@ -702,6 +702,7 @@ void handleSetCoils()
   String arg;
   httpquery;
   writetosyslog(59);
+  line = "";
   for (int i = 0; i < 3; i++)
   {
     arg = httpserver.arg(ARGS[i]);
@@ -709,12 +710,8 @@ void handleSetCoils()
     {
       if (arg == "0") mbrtu.Coil(i, false);
       if (arg == "1") mbrtu.Coil(i, true);
+      line += " " + ARGS[i] + ": " + arg + "\n";
     }
-  }
-  line = "";
-  for (uint8_t i = 0; i < httpserver.args(); i++ )
-  {
-    line += " " + httpserver.argName ( i ) + ": " + httpserver.arg ( i ) + "\n";
   }
   httpserver.send(200, TEXTPLAIN, line);
   delay(100);
