@@ -29,7 +29,7 @@ const char   *WIFI_SSID         = "";             // Wifi SSID
 const char   *WIFI_PASSWORD     = "";             // Wifi password
 
 // ports
-const int     PRT_AI_OPMODE     = 0; // analog input
+const int     PRT_AI_OPMODE     = 0;
 const int     PRT_DI_ALARM      = 5;
 const int     PRT_DI_OCPROT     = 13;
 const int     PRT_DI_SWMANU     = 12;
@@ -153,12 +153,11 @@ const String  MSG[61]           =
   /* 59 */  "set outputs (coils)",
   /* 60 */  "* Modbus query received"
 };
-const String  COIL_DESC[4]      =
+const String  COIL_DESC[3]      =
 {
-  /*  0 */  "status of the sign light outputs (0/1: red/green)",
-  /*  1 */  "status of the lamp output",
-  /*  2 */  "status of the ventilator output",
-  /*  3 */  "status of the heater output"
+  /*  0 */  "status of the lamp output",
+  /*  1 */  "status of the ventilator output",
+  /*  2 */  "status of the heater output"
 };
 const String  DI_DESC[8]        =
 {

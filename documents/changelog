@@ -1,3 +1,12 @@
+mm6d (0.4) unstable; urgency=low
+
+  * New web interface.
+  * New operation.
+  * HTTP data access in four formats (CSV, JSON, TXT and XML).
+  * Added Modbus/RTU and Modbus/TCP access.
+
+ -- Pozsar Zsolt <pozsarzs@gmail.com>  Sat, 21 Oct 2023 7:11:00
+
 mm6d (0.3) unstable; urgency=low
 
   * New help page.
