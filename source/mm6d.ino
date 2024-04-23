@@ -1,6 +1,6 @@
 // +---------------------------------------------------------------------------+
 // | MM6D v0.4 * Grow house control device                                     |
-// | Copyright (C) 2023 Pozsár Zsolt <pozsarzs@gmail.com>                      |
+// | Copyright (C) 2020-2023 Pozsár Zsolt <pozsarzs@gmail.com>                 |
 // | mm6d.ino                                                                  |
 // | Program for Adafruit Huzzah Feather                                       |
 // +---------------------------------------------------------------------------+

@@ -65,11 +65,11 @@ a. Information pages:
   http://../log       log                                              text/html
 
 b. Data access with HTTP:
-  http://../get/csv                   all values in CSV format                        text/plain
-  http://../get/json                  all values in JSON format                       text/plain
-  http://../get/txt                   all values in TXT format                        text/plain
-  http://../get/xml                   all values in XML format                        text/plain
-  http://../set?lamp=0&vent=0&heat=0  turn on and off outputs
+  http://../get/csv                   all values in CSV format         text/plain
+  http://../get/json                  all values in JSON format        text/plain
+  http://../get/txt                   all values in TXT format         text/plain
+  http://../get/xml                   all values in XML format         text/plain
+  http://../set?lamp=0&vent=0&heat=0  turn on and off outputs          text/plain
 
   Output format:
   CSV:                                    TXT:
@@ -166,4 +166,4 @@ Download from Github
    Mobile:               +36 30/249-5030
 
 --------------------------------------------------------------------------------
- MM6D * Copyright (C) 2023 Pozsar Zsolt <pozsarzs@gmail.com>
+ MM6D * Copyright (C) 2020-2023 Pozsar Zsolt <pozsarzs@gmail.com>
